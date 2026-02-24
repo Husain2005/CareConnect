@@ -13,11 +13,11 @@ export default defineConfig(({ mode }) => ({
     },
     proxy: {
       "/user": {
-        target: "http://localhost:5000",
+        target: "https://careconnect-ai-ra76.onrender.com",
         changeOrigin: true,
       },
       "/api": {
-        target: "http://localhost:5000",
+        target: "https://careconnect-ai-ra76.onrender.com",
         changeOrigin: true,
       },
     },
