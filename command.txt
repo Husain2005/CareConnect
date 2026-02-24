@@ -1,0 +1,7 @@
+first all all api keys
+commands to run:
+    under backend dir:
+        npm run seed:demo
+        npm run sync:appointments
+    under frontend dir:
+        npm run dev
