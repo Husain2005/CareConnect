@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://careconnect-ai-ra76.onrender.com";
 
 type Doctor = {
   _id: string;
