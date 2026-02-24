@@ -5,7 +5,7 @@ import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { Calendar, Clock, CheckCircle, User } from "lucide-react";
 import { toast } from "sonner";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://careconnect-ai-ra76.onrender.com";
 
 type Appointment = {
   _id: string;
