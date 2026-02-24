@@ -8,7 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
 let mongoUrl = process.env.MONGO_CONN;
 if (!mongoUrl) {
-  mongoUrl = "mongodb+srv://wariyanawaz:nawazwariya@careconnect.q5cgfxz.mongodb.net/?appName=CareConnect";
+  mongoUrl = "";
 } else {
   // Remove unsupported query options that may appear in some stored URIs
   mongoUrl = mongoUrl.replace(/\?test-db=[^&]*/i, "");
