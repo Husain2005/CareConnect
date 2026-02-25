@@ -7,7 +7,9 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Load environment variables
-dotenv.config({ path: path.resolve(__dirname, ".env") });
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({ path: path.resolve(__dirname, ".env"), quiet: true });
+};
 
 // Import DB connection
 import connectDB from "./models/db.js";
