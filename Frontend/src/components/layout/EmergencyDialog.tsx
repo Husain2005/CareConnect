@@ -12,7 +12,7 @@ type ChatItem = {
   text: string;
 };
 
-const API_URL = import.meta.env.VITE_API_URL || "";
+const API_URL = import.meta.env.VITE_API_URL || "https://careconnect-ai-ra76.onrender.com";
 
 export const EmergencyDialog = ({ role }: EmergencyDialogProps) => {
   const [open, setOpen] = useState(false);
