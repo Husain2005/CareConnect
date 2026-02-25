@@ -6,10 +6,10 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Load environment variables
-if (process.env.NODE_ENV !== "production") {
+// Load environment variables only for local development
+if (process.env.NODE_ENV !== "production" && process.env.RENDER !== "true") {
   dotenv.config({ path: path.resolve(__dirname, ".env"), quiet: true });
-};
+}
 
 // Import DB connection
 import connectDB from "./models/db.js";
@@ -25,6 +25,11 @@ import emergencyRoutes from "./routes/emergency.js";
 const app = express();
 const port = process.env.PORT || 5000;
 
+const envOrigins = String(process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
+
 // Connect Database
 connectDB();
 
@@ -35,7 +40,12 @@ app.use(
       if (!origin) return callback(null, true);
 
       const isLocalhost = /^https?:\/\/localhost:\d+$/.test(origin);
-      const isTrustedRemote = origin === "https://auth-app-devv27.vercel.app";
+      const hardcodedTrustedOrigins = [
+        "https://auth-app-devv27.vercel.app",
+        "https://ai-careconnect.vercel.app",
+        "https://www.ai-careconnect.vercel.app",
+      ];
+      const isTrustedRemote = [...hardcodedTrustedOrigins, ...envOrigins].includes(origin);
 
       if (isLocalhost || isTrustedRemote) {
         return callback(null, true);
@@ -70,4 +80,3 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);
 });
-// password Xob5sBjrdMou2kPU 
