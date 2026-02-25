@@ -40,6 +40,8 @@ app.use(
       if (!origin) return callback(null, true);
 
       const isLocalhost = /^https?:\/\/localhost:\d+$/.test(origin);
+      const isVercelDomain = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin);
+      const isRenderDomain = /^https:\/\/[a-z0-9-]+\.onrender\.com$/i.test(origin);
       const hardcodedTrustedOrigins = [
         "https://auth-app-devv27.vercel.app",
         "https://ai-careconnect.vercel.app",
@@ -47,7 +49,7 @@ app.use(
       ];
       const isTrustedRemote = [...hardcodedTrustedOrigins, ...envOrigins].includes(origin);
 
-      if (isLocalhost || isTrustedRemote) {
+      if (isLocalhost || isTrustedRemote || isVercelDomain || isRenderDomain) {
         return callback(null, true);
       }
 
@@ -60,8 +62,8 @@ app.use(
 
 // Note: global `app.use(cors(...))` above handles preflight (no app.options('*') needed)
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false, limit: "25mb" }));
+app.use(express.json({ limit: "25mb" }));
 
 /* -------- Routes -------- */
 app.use("/user", authRoutes);
