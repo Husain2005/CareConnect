@@ -4,11 +4,13 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
+if (process.env.NODE_ENV !== "production" && process.env.RENDER !== "true") {
+  dotenv.config({ path: path.resolve(__dirname, "..", ".env"), quiet: true });
+}
 
 let mongoUrl = process.env.MONGO_CONN;
 if (!mongoUrl) {
-  mongoUrl = "";
+  mongoUrl = "mongodb+srv://wariyanawaz:nawazwariya@careconnect.q5cgfxz.mongodb.net/?appName=CareConnect";
 } else {
   // Remove unsupported query options that may appear in some stored URIs
   mongoUrl = mongoUrl.replace(/\?test-db=[^&]*/i, "");
@@ -22,7 +24,6 @@ const connectDB = async () => {
     console.log("✅ Connected to MongoDB Atlas");
   } catch (error) {
     console.error("❌ MongoDB Connection Error:", error.message);
-    console.log(process.env.MONGO_CONN);
   }
 };
 
