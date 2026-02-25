@@ -102,59 +102,63 @@ export const getAllDoctors = async (req, res) => {
     const hasGeo = userLat !== null && userLng !== null;
 
     if (hasGeo) {
-      const aggregate = await Doctor.aggregate([
-        {
-          $geoNear: {
-            near: { type: "Point", coordinates: [userLng, userLat] },
-            distanceField: "distanceMeters",
-            spherical: true,
-            ...(strictRadius ? { maxDistance: radiusKm * 1000 } : {}),
-            query: baseFilters,
+      try {
+        const aggregate = await Doctor.aggregate([
+          {
+            $geoNear: {
+              near: { type: "Point", coordinates: [userLng, userLat] },
+              distanceField: "distanceMeters",
+              spherical: true,
+              ...(strictRadius ? { maxDistance: radiusKm * 1000 } : {}),
+              query: baseFilters,
+            },
           },
-        },
-        {
-          $addFields: {
-            distanceKm: { $round: [{ $divide: ["$distanceMeters", 1000] }, 2] },
+          {
+            $addFields: {
+              distanceKm: { $round: [{ $divide: ["$distanceMeters", 1000] }, 2] },
+            },
           },
-        },
-        {
-          $sort:
-            sortBy === "rating"
-              ? { averageRating: -1, rating: -1, distanceMeters: 1 }
-              : sortBy === "fee"
-              ? { consultationFeePhysicalVisit: 1, consultationFee: 1, distanceMeters: 1 }
-              : { distanceMeters: 1, averageRating: -1, rating: -1 },
-        },
-        {
-          $facet: {
-            items: [
-              { $skip: skip },
-              { $limit: limit },
-              {
-                $project: {
-                  userId: 0,
+          {
+            $sort:
+              sortBy === "rating"
+                ? { averageRating: -1, rating: -1, distanceMeters: 1 }
+                : sortBy === "fee"
+                ? { consultationFeePhysicalVisit: 1, consultationFee: 1, distanceMeters: 1 }
+                : { distanceMeters: 1, averageRating: -1, rating: -1 },
+          },
+          {
+            $facet: {
+              items: [
+                { $skip: skip },
+                { $limit: limit },
+                {
+                  $project: {
+                    userId: 0,
+                  },
                 },
-              },
-            ],
-            totalCount: [{ $count: "count" }],
+              ],
+              totalCount: [{ $count: "count" }],
+            },
           },
-        },
-      ]);
+        ]);
 
-      const payload = aggregate[0] || { items: [], totalCount: [] };
-      const total = payload.totalCount?.[0]?.count || 0;
+        const payload = aggregate[0] || { items: [], totalCount: [] };
+        const total = payload.totalCount?.[0]?.count || 0;
 
-      return res.json({
-        items: payload.items,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.max(Math.ceil(total / limit), 1),
-        },
-        filters: { query: queryText, specialty, country, city, subCity },
-        geo: { enabled: true, radiusKm, userLat, userLng },
-      });
+        return res.json({
+          items: payload.items,
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.max(Math.ceil(total / limit), 1),
+          },
+          filters: { query: queryText, specialty, country, city, subCity, language, minRating, maxFee, sortBy },
+          geo: { enabled: true, radiusKm, userLat, userLng, strictRadius },
+        });
+      } catch (geoError) {
+        console.error("Geo query failed, falling back to non-geo search:", geoError?.message || geoError);
+      }
     }
 
     const sortConfig =
